@@ -1,73 +1,94 @@
-import customtkinter as ctk
+import tkinter as tk
 from tkinter import messagebox
+from tkinter.scrolledtext import ScrolledText
+import ttkbootstrap as tb
+from ttkbootstrap.constants import *
 import os
 
-# Configuração do tema visual (moderno e limpo)
-ctk.set_appearance_mode("light")  
-ctk.set_default_color_theme("blue")
-
-class AppHospital(ctk.CTk):
+class AppHospital(tb.Window):
     def __init__(self):
-        super().__init__()
+        # Inicializa a janela com o tema 'flatly' (moderno, limpo e ótimo para saúde)
+        super().__init__(themename="flatly")
 
-        # Configurações da Janela (Aumentada para caber a lista de resultados)
+        # Configurações da Janela
         self.title("Sistema Hospitalar - Cadastro de Paciente")
         self.geometry("550x850")
         self.resizable(False, False)
 
         # Título da Tela
-        self.titulo = ctk.CTkLabel(self, text="Cadastro de Paciente", font=ctk.CTkFont(size=24, weight="bold"))
-        self.titulo.pack(pady=(20, 10))
+        self.titulo = tb.Label(
+            self, 
+            text="Cadastro de Paciente", 
+            font=("Helvetica", 20, "bold"), 
+            bootstyle="primary"
+        )
+        self.titulo.pack(pady=(25, 15))
 
         # Container Principal para os Campos
-        self.frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.frame = tb.Frame(self)
         self.frame.pack(fill="x", padx=40)
 
         # --- Nome Completo ---
-        self.lbl_nome = ctk.CTkLabel(self.frame, text="Nome Completo:", font=ctk.CTkFont(size=14, weight="bold"))
+        self.lbl_nome = tb.Label(self.frame, text="Nome Completo:", font=("Helvetica", 11, "bold"))
         self.lbl_nome.pack(anchor="w", pady=(5, 2))
-        self.txt_nome = ctk.CTkEntry(self.frame, placeholder_text="Digite o nome completo", width=470)
-        self.txt_nome.pack(anchor="w", pady=(0, 5))
+        self.txt_nome = tb.Entry(self.frame, width=50)
+        self.txt_nome.pack(fill="x", pady=(0, 5))
 
         # --- CPF ---
-        self.lbl_cpf = ctk.CTkLabel(self.frame, text="CPF:", font=ctk.CTkFont(size=14, weight="bold"))
+        self.lbl_cpf = tb.Label(self.frame, text="CPF:", font=("Helvetica", 11, "bold"))
         self.lbl_cpf.pack(anchor="w", pady=(5, 2))
-        self.txt_cpf = ctk.CTkEntry(self.frame, placeholder_text="000.000.000-00", width=470)
-        self.txt_cpf.pack(anchor="w", pady=(0, 5))
+        self.txt_cpf = tb.Entry(self.frame, width=50)
+        self.txt_cpf.pack(fill="x", pady=(0, 5))
+        # Nota: Placeholder text em Entry tradicional/ttk requer bindings,
+        # para manter o código limpo, os campos começam vazios.
 
         # --- Data de Nascimento ---
-        self.lbl_nascimento = ctk.CTkLabel(self.frame, text="Data de Nascimento:", font=ctk.CTkFont(size=14, weight="bold"))
+        self.lbl_nascimento = tb.Label(self.frame, text="Data de Nascimento (DD/MM/AAAA):", font=("Helvetica", 11, "bold"))
         self.lbl_nascimento.pack(anchor="w", pady=(5, 2))
-        self.txt_nascimento = ctk.CTkEntry(self.frame, placeholder_text="DD/MM/AAAA", width=470)
-        self.txt_nascimento.pack(anchor="w", pady=(0, 5))
+        self.txt_nascimento = tb.Entry(self.frame, width=50)
+        self.txt_nascimento.pack(fill="x", pady=(0, 5))
 
         # --- Gênero ---
-        self.lbl_genero = ctk.CTkLabel(self.frame, text="Gênero:", font=ctk.CTkFont(size=14, weight="bold"))
+        self.lbl_genero = tb.Label(self.frame, text="Gênero:", font=("Helvetica", 11, "bold"))
         self.lbl_genero.pack(anchor="w", pady=(5, 2))
-        self.cbo_genero = ctk.CTkComboBox(self.frame, values=["Masculino", "Feminino", "Outro", "Não informar"], width=470)
-        self.cbo_genero.pack(anchor="w", pady=(0, 5))
+        self.cbo_genero = tb.Combobox(
+            self.frame, 
+            values=["Masculino", "Feminino", "Outro", "Não informar"], 
+            state="readonly"
+        )
+        self.cbo_genero.pack(fill="x", pady=(0, 5))
         self.cbo_genero.set("Selecione...")
 
         # --- Tipo Sanguíneo ---
-        self.lbl_sangue = ctk.CTkLabel(self.frame, text="Tipo Sanguíneo:", font=ctk.CTkFont(size=14, weight="bold"))
+        self.lbl_sangue = tb.Label(self.frame, text="Tipo Sanguíneo:", font=("Helvetica", 11, "bold"))
         self.lbl_sangue.pack(anchor="w", pady=(5, 2))
-        self.cbo_sangue = ctk.CTkComboBox(self.frame, values=["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"], width=470)
-        self.cbo_sangue.pack(anchor="w", pady=(0, 15))
+        self.cbo_sangue = tb.Combobox(
+            self.frame, 
+            values=["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"], 
+            state="readonly"
+        )
+        self.cbo_sangue.pack(fill="x", pady=(0, 20))
         self.cbo_sangue.set("Selecione...")
 
         # --- Botão de Salvar ---
-        self.btn_salvar = ctk.CTkButton(self.frame, text="Cadastrar Paciente", command=self.salvar_cadastro, height=40, font=ctk.CTkFont(size=16, weight="bold"))
-        self.btn_salvar.pack(fill="x", pady=(0, 15))
+        # O bootstyle="success" deixa o botão verde, ideal para ações positivas/salvar
+        self.btn_salvar = tb.Button(
+            self.frame, 
+            text="Cadastrar Paciente", 
+            command=self.salvar_cadastro, 
+            bootstyle="success",
+        )
+        self.btn_salvar.pack(fill="x", pady=(0, 20))
 
         # -------------------------------------------------------------
         # ÁREA DE RESULTADOS (Exibição dos Pacientes Cadastrados)
         # -------------------------------------------------------------
-        self.lbl_resultados = ctk.CTkLabel(self, text="Pacientes Cadastrados:", font=ctk.CTkFont(size=16, weight="bold"))
+        self.lbl_resultados = tb.Label(self, text="Pacientes Cadastrados:", font=("Helvetica", 12, "bold"), bootstyle="secondary")
         self.lbl_resultados.pack(anchor="w", padx=40, pady=(10, 5))
 
-        # Caixa de texto com barra de rolagem automática
-        self.txt_resultados = ctk.CTkTextbox(self, width=470, height=220, font=ctk.CTkFont(size=12))
-        self.txt_resultados.pack(padx=40, pady=(0, 20))
+        # Caixa de texto com barra de rolagem (ScrolledText) estilizada pelo bootstrap
+        self.txt_resultados = ScrolledText(self, width=50, height=10, font=("Courier New", 10))
+        self.txt_resultados.pack(fill="both", expand=True, padx=40, pady=(0, 30))
         
         # Carrega os pacientes já existentes se o arquivo já tiver dados
         self.atualizar_lista_resultados()
@@ -101,14 +122,14 @@ class AppHospital(ctk.CTk):
         """Lê o arquivo de texto e exibe tudo dentro da caixinha de resultados"""
         # Habilita a edição temporariamente para atualizar o texto
         self.txt_resultados.configure(state="normal")
-        self.txt_resultados.delete("0.0", "end")
+        self.txt_resultados.delete("1.0", "end")
         
         if os.path.exists("pacientes.txt"):
             with open("pacientes.txt", "r", encoding="utf-8") as arquivo:
                 conteudo = arquivo.read()
-                self.txt_resultados.insert("0.0", conteudo)
+                self.txt_resultados.insert("1.0", conteudo)
         else:
-            self.txt_resultados.insert("0.0", "Nenhum paciente cadastrado ainda.")
+            self.txt_resultados.insert("1.0", "Nenhum paciente cadastrado ainda.")
             
         # Bloqueia o usuário de digitar direto na caixa de resultados
         self.txt_resultados.configure(state="disabled")
